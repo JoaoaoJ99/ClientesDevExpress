@@ -1,0 +1,54 @@
+﻿@page "/criar-cliente"
+
+@using ClientesDevExpress.Models
+@inject ClienteService ClienteService
+@inject NavigationManager NavManager
+
+<h2>Criar Cliente</h2>
+
+<div class="cw-880">
+    
+    <EditForm OnValidSubmit="@HandleValidSubmit"
+              Context="EditFormContext"
+              Model="@NovoCliente">
+        <DataAnnotationsValidator/>
+        <DxFormLayout CssClass="w-100">
+            <DxFormLayoutItem Caption="Nome do cliente:" ColSpanMd="12">
+                    <DxTextBox @bind-Text="@Nome" 
+                               NullText="Nome"
+                               ShowValidationIcon="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Email:" BeginRow="true">
+                    <DxTextBox @bind-Text="@Email" 
+                               NullText="Email"
+                               ShowValidationIcon="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Telefone:" BeginRow="true">
+                    <DxSpinEdit @bind-Value="@Telefone" 
+                                Mask="#########"
+                                ShowValidationIcon="true"/>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem ColSpanMd="12">
+                        <DxButton SubmitFormOnClick="true"
+                                  Text="Submeter"
+                                  RenderStyle="ButtonRenderStyle.Secondary"/>
+                    </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditForm>
+</div>
+
+
+
+@code {
+    string Nome { get; set; }
+    string Email { get; set; }
+    int Telefone { get; set; }
+
+    Cliente NovoCliente = new Cliente();
+
+    void HandleValidSubmit() {
+        ClienteService.AddCliente(Nome, Email, Telefone.ToString());
+        NavManager.NavigateTo("/grid");
+    }
+
+}

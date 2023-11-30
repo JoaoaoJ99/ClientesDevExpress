@@ -1,0 +1,41 @@
+﻿@page "/grid"
+
+@using ClientesDevExpress.Models
+@inject WeatherForecastService ForecastService
+@inject ClienteService ClienteService
+@inject NavigationManager NavManager
+
+
+<h2>Clientes</h2>
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <DxButton Text="Adicionar Cliente"
+          Click="@NavigateCriar" />
+    <p/>
+    <DxGrid Data="@Data">
+        <Columns>
+            <DxGridDataColumn FieldName="Nome" SortIndex="0" AllowSort="true"/>
+            <DxGridDataColumn FieldName="Email" SortIndex="1" AllowSort="true"/>
+            <DxGridDataColumn FieldName="Telefone" SortIndex="2" AllowSort="true"/>
+        </Columns>
+    </DxGrid>
+    }
+
+@code {
+    object Data { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Data = await ClienteService.GetClientesList();
+    }
+
+    void NavigateCriar()
+    {
+        NavManager.NavigateTo("/criar-cliente");
+    }
+}
