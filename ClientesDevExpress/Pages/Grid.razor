@@ -17,17 +17,35 @@ else
     <DxButton Text="Adicionar Cliente"
           Click="@NavigateCriar" />
     <p/>
-    <DxGrid Data="@Data">
+    <DxGrid Data="@Data"
+            PageSize="12"
+            KeyFieldName="ClienteID"
+            EditModelSaving="Grid_EditModelSaving"
+            DataItemDeleting="Grid_DataItemDeleting">
         <Columns>
+            <DxGridCommandColumn Width="160px" />
             <DxGridDataColumn FieldName="Nome" SortIndex="0" AllowSort="true"/>
             <DxGridDataColumn FieldName="Email" SortIndex="1" AllowSort="true"/>
             <DxGridDataColumn FieldName="Telefone" SortIndex="2" AllowSort="true"/>
         </Columns>
+        <EditFormTemplate Context="EditFormContext">
+        <DxFormLayout CssClass="w-100">
+            <DxFormLayoutItem Caption="Nome:" ColSpanMd="6">
+                @EditFormContext.GetEditor("Nome")
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Email:" ColSpanMd="6">
+                @EditFormContext.GetEditor("Email")
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Telefone:" ColSpanMd="6">
+                @EditFormContext.GetEditor("Telefone")
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
     </DxGrid>
     }
 
 @code {
-    object Data { get; set; }
+    IEnumerable<Cliente> Data { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,5 +55,21 @@ else
     void NavigateCriar()
     {
         NavManager.NavigateTo("/criar-cliente");
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+        var editCliente = (Cliente)e.EditModel;
+        if(e.IsNew)
+            ClienteService.AddCliente(editCliente.Nome, editCliente.Email, editCliente.Telefone);
+        else
+            await ClienteService.UpdateClienteAsync((Cliente)e.DataItem, editCliente);
+        await UpdateDataAsync();
+    }
+    async Task Grid_DataItemDeleting(GridDataItemDeletingEventArgs e) {
+        await ClienteService.RemoveClienteAsync((Cliente)e.DataItem);
+        await UpdateDataAsync();
+    }
+    async Task UpdateDataAsync() {
+        Data = await ClienteService.GetClientesList();
     }
 }

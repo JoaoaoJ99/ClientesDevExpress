@@ -24,7 +24,7 @@ namespace ClientesDevExpress.Models
             }
         }
 
-        public void AddCliente(string Nome, string Email, string Telefone)
+        public void AddCliente(string Nome, string Email, int Telefone)
         {
             using (var connection = new SqlConnection(connectionString))
             {
@@ -32,11 +32,50 @@ namespace ClientesDevExpress.Models
                 Cliente novoCliente = new Cliente {
                     Nome = Nome,
                     Email = Email,
-                    Telefone = Telefone
+                    TelefoneString = Telefone.ToString()
                 };
 
-                var sql = "INSERT INTO Clientes(nome, email, telefone) VALUES (@Nome, @Email, @Telefone)";
+                var sql = "INSERT INTO Clientes(nome, email, telefone) VALUES (@Nome, @Email, @TelefoneString)";
                 connection.Execute(sql, novoCliente);
+
+            }
+        }
+
+        public async Task UpdateClienteAsync(Cliente cliente, Cliente novoCliente)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                Cliente clienteEdit = new Cliente
+                {
+                    Nome = novoCliente.Nome,
+                    Email = novoCliente.Email,
+                    TelefoneString = novoCliente.Telefone.ToString()
+                };
+
+                await connection.OpenAsync();
+
+                var sql = "UPDATE Clientes " +
+                          "SET Nome=@Nome, Email=@Email, Telefone=@TelefoneString " +
+                          "WHERE ClienteID=@ClienteID";
+                connection.Execute(sql, new
+                {
+                    clienteEdit.Nome,
+                    clienteEdit.Email,
+                    clienteEdit.TelefoneString,
+                    cliente.ClienteID
+                });
+
+            }
+        }
+
+        public async Task RemoveClienteAsync(Cliente cliente)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                var sql = "DELETE FROM Clientes WHERE ClienteID=@ClienteID";
+                connection.Execute(sql, cliente);
 
             }
         }

@@ -9,25 +9,31 @@
 <div class="cw-880">
     
     <EditForm OnValidSubmit="@HandleValidSubmit"
+              OnInvalidSubmit="@HandleInvalidSubmit"
               Context="EditFormContext"
               Model="@NovoCliente">
         <DataAnnotationsValidator/>
         <DxFormLayout CssClass="w-100">
-            <DxFormLayoutItem Caption="Nome do cliente:" ColSpanMd="12">
-                    <DxTextBox @bind-Text="@Nome" 
+            <DxFormLayoutItem Caption="Nome do cliente:">
+                    <DxTextBox @bind-Text="@NovoCliente.Nome" 
                                NullText="Nome"
                                ShowValidationIcon="true"/>
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Email:" BeginRow="true">
-                    <DxTextBox @bind-Text="@Email" 
+                    <DxTextBox @bind-Text="@NovoCliente.Email" 
                                NullText="Email"
                                ShowValidationIcon="true"/>
             </DxFormLayoutItem>
             <DxFormLayoutItem Caption="Telefone:" BeginRow="true">
-                    <DxSpinEdit @bind-Value="@Telefone" 
+                    <DxSpinEdit @bind-Value="@NovoCliente.Telefone" 
                                 Mask="#########"
                                 ShowValidationIcon="true"/>
             </DxFormLayoutItem>
+            <div class="row w-100 mx-0" style="color:red">
+                <p class="demo-text col-12 mt-2">
+                    <b>@FormValidationState</b>
+                </p>
+            </div>
             <DxFormLayoutItem ColSpanMd="12">
                         <DxButton SubmitFormOnClick="true"
                                   Text="Submeter"
@@ -35,6 +41,7 @@
                     </DxFormLayoutItem>
         </DxFormLayout>
     </EditForm>
+     
 </div>
 
 
@@ -43,12 +50,18 @@
     string Nome { get; set; }
     string Email { get; set; }
     int Telefone { get; set; }
+    string FormValidationState { get; set; }
 
     Cliente NovoCliente = new Cliente();
 
     void HandleValidSubmit() {
-        ClienteService.AddCliente(Nome, Email, Telefone.ToString());
+        ClienteService.AddCliente(NovoCliente.Nome, NovoCliente.Email, NovoCliente.Telefone);
         NavManager.NavigateTo("/grid");
+    }
+
+    void HandleInvalidSubmit()
+    {
+        FormValidationState = @"Preencha todos os campos corretamente!";
     }
 
 }
